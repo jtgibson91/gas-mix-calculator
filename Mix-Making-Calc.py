@@ -146,7 +146,6 @@ def get_component_info(number_of_components):
 			components[i] = input()
 
 			if components[i] not in SUPPORTED_COMPONENTS:
-				del components[i]
 				print(f'The component must be one of these {SUPPORTED_COMPONENTS} - try again:')
 
 		# If this is the final component, allow for Balance gas % calculation
