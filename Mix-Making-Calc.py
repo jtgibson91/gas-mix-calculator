@@ -40,12 +40,10 @@ DEFAULT_ROUNDING_VALUE = 4
 def round_number(number, places_after_decimal=DEFAULT_ROUNDING_VALUE):
 	""" 
 	Reduce places after decimal point for decimal.Decimal types
-
 	:param number: The number to round
 	:type number: decimal.Decimal
 	:param places_after_decimal: The # of places after the decimal point to display number to. Defaults to 4
 	:type places_after_decimal: int
-
 	:return a decimal.Decimal object: Rounded to 'places_after_decimal' places after the decimal point
 	"""
 
@@ -80,7 +78,6 @@ def round_number(number, places_after_decimal=DEFAULT_ROUNDING_VALUE):
 def get_cylinder_size():
 	""" 
 	Gets the cylinder size input from the user and validates the input
-
 	:return str: 'H' or 'J'; the gas cylinder type
 	"""
 
@@ -101,7 +98,6 @@ def get_cylinder_size():
 def get_number_of_components():
 	""" 
 	Gets the # of gas components that will make up the mix from the user  and validates the input
-
 	:return int: # of gas components
 	"""
 
@@ -127,10 +123,8 @@ def get_number_of_components():
 def get_component_info(number_of_components):
 	""" 
 	Gets the gas components and their corresponding proportions from the user
-
 	:param number_of_components: The # of chemical components making up the gas mixture
 	:type number_of_components: int
-
 	:return two lists: List 1 holds the gas components (list of str). List 2 holds the respective percentages for the gas 
 	components (list of decimal.Decimal)
 	"""
@@ -155,7 +149,14 @@ def get_component_info(number_of_components):
 				del components[i]
 				print(f'The component must be one of these {SUPPORTED_COMPONENTS} - try again:')
 
-		print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5). If its the final component, you can type Bal for balance:')
+		# print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
+
+		# If this is the final component, allow for Balance gas % calculation
+		if not i == number_of_components - 1:
+			print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
+		else:
+			print(f'Enter the percentage of {components[i]} in the mix. You can also type Bal (balance gas) for auto-calculation of the %:')
+
 
 		while not isinstance(components_percentages[i], Decimal):
 
@@ -183,15 +184,12 @@ def get_component_info(number_of_components):
 def percent_to_mass(component, cylinder_size, component_percentage):
 	""" 
 	Converts the percent by volume of a component to its mass (kilograms)
-
 	:param component: The molecular/atomic symbol for the gas
 	:type component: str
 	:param cylinder_size: The size of the cylinder to be filled. Either 'H' or 'J'
 	:type cylinder_size: str
 	:param component_percentage: The percentage of the cylinder that will be filled with this component
 	:type component_percentage: decimal.Decimal
-
-
 	:return decimal.Decimal: The mass (kg) of the gas component in the mixture
 	"""
 
@@ -210,12 +208,10 @@ def percent_to_mass(component, cylinder_size, component_percentage):
 def calculate_mix_makeup(components, components_percentages):
 	""" 
 	Calculates the masses of each component required to make the specified mix
-
 	:param components: List holding the gas components
 	:type components: list of str
 	:param components_percentages: List holding the gas components percentages
 	:type components_percentages: list of decimal.Decimal
-
 	:return a dict {component1: component1_mass, 
 					etc.. }
 	"""
@@ -235,10 +231,8 @@ def calculate_mix_makeup(components, components_percentages):
 def print_result(components_masses):
 	""" 
 	Prints the results to the console in a decent looking way
-
 	:param components_masses: dict holding the gas components and their masses
 	:type components_masses: dict
-
 	:return None
 	"""
 
@@ -273,4 +267,3 @@ while True:
 
 	# Display results in console
 	print_result(components_masses=components_masses_kg_dict)
-
