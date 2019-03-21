@@ -182,7 +182,7 @@ def get_component_info(number_of_components):
 
 def percent_to_mass(component, cylinder_size, component_percentage):
 	""" 
-	Converts the percent by weight of a component to its mass (kilograms)
+	Converts the percent by volume of a component to its mass (kilograms)
 
 	:param component: The molecular/atomic symbol for the gas
 	:type component: str
@@ -259,8 +259,9 @@ while True:
 
 	# How many different components are there in the gas mixture?
 	num_components = get_number_of_components()
+	
 
-	# What are the different components and what weight % do they contribute to the mix?
+	# What are the different components and what volume % do they contribute to the mix?
 	components, components_percentages = get_component_info(number_of_components=num_components)
 
 	# Be liberal and just let user know that their math is off
