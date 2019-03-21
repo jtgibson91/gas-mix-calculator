@@ -254,7 +254,6 @@ while True:
 	# How many different components are there in the gas mixture?
 	num_components = get_number_of_components()
 	
-
 	# What are the different components and what volume % do they contribute to the mix?
 	components, components_percentages = get_component_info(number_of_components=num_components)
 
