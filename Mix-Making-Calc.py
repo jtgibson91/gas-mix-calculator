@@ -149,14 +149,11 @@ def get_component_info(number_of_components):
 				del components[i]
 				print(f'The component must be one of these {SUPPORTED_COMPONENTS} - try again:')
 
-		# print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
-
 		# If this is the final component, allow for Balance gas % calculation
 		if not i == number_of_components - 1:
 			print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
 		else:
 			print(f'Enter the percentage of {components[i]} in the mix. You can also type Bal (balance gas) for auto-calculation of the %:')
-
 
 		while not isinstance(components_percentages[i], Decimal):
 
