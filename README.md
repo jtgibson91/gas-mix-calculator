@@ -4,6 +4,8 @@ A CLI script for calculating gas mix values. Takes the following input from the 
   - Gas components (e.g. H2, CO2, N2, etc.) and their percentage by volume 
 
   - The script then returns the weight (kilograms) of each component required to make the specified mix
+  
+![alt text](term2.png)
 
 ## Modules Used
 
