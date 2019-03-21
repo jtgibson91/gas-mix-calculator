@@ -5,7 +5,7 @@ A CLI script for calculating gas mix values. Takes the following input from the 
 
   - The script then returns the weight (kilograms) of each component required to make the specified mix
   
-![alt text](term2.png)
+![alt text](mix_calc_terminal.png)
 
 ## Modules Used
 
