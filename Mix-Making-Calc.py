@@ -84,7 +84,7 @@ def get_cylinder_size():
 	:return str: 'H' or 'J'; the gas cylinder type
 	"""
 
-	print('Enter the clyinder size (H or J):')
+	print('Enter the cylinder size (H or J):')
 
 	cyl_size = None
 	# Loop until user enters valid input
@@ -155,7 +155,7 @@ def get_component_info(number_of_components):
 				del components[i]
 				print(f'The component must be one of these {SUPPORTED_COMPONENTS} - try again:')
 
-		print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
+		print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5). If its the final component, you can type Bal for balance:')
 
 		while not isinstance(components_percentages[i], Decimal):
 
