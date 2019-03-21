@@ -17,7 +17,7 @@ Python Standard Library
 I made this for myself to use at work as a QC chemist at an industrial compressed gas company. Anyone who makes similar gas mixtures will find it useful too.
 
 ## Project Goals
-  - Possibly create a GUI using pyQT
+  - Possibly create a GUI using PyQT
 
 
 ## Created By
