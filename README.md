@@ -1,9 +1,9 @@
 # gas-mix-calculator
 A CLI script for calculating gas mix values. Takes the following input from the user:
   - Gas cylinder size (250 mol, 350 mol)
-  - Gas components (e.g. H2, CO2, N2) and their percentage by volume 
+  - Gas components (e.g. H2, CO2, N2, etc.) and their percentage by volume 
 
-  - The script then returns to the console the weight (kilograms) of each component required to make the specified mix
+  - The script then returns the weight (kilograms) of each component required to make the specified mix
 
 ## Modules Used
 
