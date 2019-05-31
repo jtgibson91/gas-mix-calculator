@@ -20,14 +20,16 @@ COMPONENTS_MOLAR_MASS_DICT = {
 	'Ar': AR_KG_PER_MOL
 }
 
-SUPPORTED_CYL_SIZES = ('H', 'J')
+SUPPORTED_CYL_SIZES = ('H', 'J', 'S')
+S_CYL_SIZE_MOL = 65
 H_CYL_SIZE_MOL = 250
 J_CYL_SIZE_MOL = 350
 
 CYL_SIZES_MOLES_DICT = {
 
 	'H': H_CYL_SIZE_MOL,
-	'J': J_CYL_SIZE_MOL
+	'J': J_CYL_SIZE_MOL,
+	'S': S_CYL_SIZE_MOL
 }
 
 MIN_NUMBER_OF_COMPONENTS = 2
@@ -81,7 +83,7 @@ def get_cylinder_size():
 	:return str: 'H' or 'J'; the gas cylinder type
 	"""
 
-	print('Enter the cylinder size (H or J):')
+	print('Enter the cylinder size (H, J, S):')
 
 	cyl_size = None
 	# Loop until user enters valid input
@@ -90,7 +92,7 @@ def get_cylinder_size():
 		cyl_size = input()
 
 		if cyl_size not in SUPPORTED_CYL_SIZES:
-			print('The cylinder size must be either H or J - try again:')
+			print('The cylinder size must be either H, J or S - try again:')
 
 	return cyl_size
 
