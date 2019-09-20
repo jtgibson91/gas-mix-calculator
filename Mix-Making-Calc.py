@@ -1,6 +1,7 @@
 from decimal import Decimal, InvalidOperation
 
 SUPPORTED_COMPONENTS = ('H2', 'He', 'CH4', 'CO2', 'O2', 'N2', 'Ar')
+
 H2_KG_PER_MOL = Decimal(0.002016)
 HE_KG_PER_MOL = Decimal(0.0040026)
 CH4_KG_PER_MOL = Decimal(0.016043)
@@ -38,9 +39,8 @@ MAX_NUMBER_OF_COMPONENTS = 5
 # Change this based on mix tolerance and/or scale sensitivity
 DEFAULT_ROUNDING_VALUE = 4
 
-
 def round_number(number, places_after_decimal=DEFAULT_ROUNDING_VALUE):
-	""" 
+	"""
 	Reduce places after decimal point for decimal.Decimal types
 	:param number: The number to round
 	:type number: decimal.Decimal
@@ -76,191 +76,221 @@ def round_number(number, places_after_decimal=DEFAULT_ROUNDING_VALUE):
 	elif places_after_decimal == 8:
 		return number.quantize(Decimal("0.00000001"))
 
+class GasMixture:
 
-def get_cylinder_size():
-	""" 
-	Gets the cylinder size input from the user and validates the input
-	:return str: 'H' or 'J'; the gas cylinder type
-	"""
+	def __init__(self, cylinder_size=None, number_of_components=0, components=None, components_masses=None):
+		"""
+		Create a new gas mixture
 
-	print('Enter the cylinder size (H, J, S):')
+		:param cylinder_size: The size of cylinder used to make the mix. Value must be in SUPPORTED_CYL_SIZES
+			e.g. 'H'
+		:type cylinder_size: str
+		:param number_of_components: The number of components that make up the mix
+		:type number_of_components: int
+		:param components: A dict with this format: keys: the gas component, values: the percent by volume
+			that component accounts for in the mix
+		:type components: dict {str: decimal.Decimal}
+		:param components_masses: A dict with this format: keys: the gas component, values: the
+			mass of that component
+		:type components_masses: dict {str: decimal.Decimal}
 
-	cyl_size = None
-	# Loop until user enters valid input
-	while cyl_size not in SUPPORTED_CYL_SIZES:
+		"""
 
-		cyl_size = input()
+		self.cylinder_size = cylinder_size
+		self.number_of_components = number_of_components
+		self.components = components
+		self.components_masses = components_masses
 
-		if cyl_size not in SUPPORTED_CYL_SIZES:
-			print('The cylinder size must be either H, J or S - try again:')
+	def __str__(self, feedback=''):
+		return feedback
 
-	return cyl_size
+	def set_cylinder_size(self):
+		"""
+		Gets the cylinder size input from the user, validates the input, and sets self.cylinder_size
 
+		:return: None
+		"""
 
-def get_number_of_components():
-	""" 
-	Gets the # of gas components that will make up the mix from the user  and validates the input
-	:return int: # of gas components
-	"""
+		print('Enter the cylinder size (H, J, S):')
 
-	print(f'Enter the # of components ({MIN_NUMBER_OF_COMPONENTS}-{MAX_NUMBER_OF_COMPONENTS}): ')
+		# Loop until user enters valid input
+		while self.cylinder_size not in SUPPORTED_CYL_SIZES:
 
-	num_components = None
-	while num_components not in range(MIN_NUMBER_OF_COMPONENTS, MAX_NUMBER_OF_COMPONENTS+1):
+			self.cylinder_size = input()
 
-		num_components = input()
+			if self.cylinder_size not in SUPPORTED_CYL_SIZES:
+				print('The cylinder size must be either H, J or S - try again:')
 
-		try:
-			num_components = int(num_components)
-		except ValueError:
-			print(f'The # of components must be a number between {MIN_NUMBER_OF_COMPONENTS} and {MAX_NUMBER_OF_COMPONENTS} - try again:')
-			continue
+	def set_number_of_components(self):
+		"""
+		Gets the # of gas components that will make up the mix from the user, validates the input, and sets
+			self.number_of_components
 
-		if num_components not in range(MIN_NUMBER_OF_COMPONENTS, MAX_NUMBER_OF_COMPONENTS+1):
-			print(f'The # of components must be between {MIN_NUMBER_OF_COMPONENTS} and {MAX_NUMBER_OF_COMPONENTS} - try again:')
+		:return: None
+		"""
 
-	return num_components
+		print(f'Enter the # of components ({MIN_NUMBER_OF_COMPONENTS}-{MAX_NUMBER_OF_COMPONENTS}): ')
 
+		while self.number_of_components not in range(MIN_NUMBER_OF_COMPONENTS, MAX_NUMBER_OF_COMPONENTS + 1):
 
-def get_component_info(number_of_components):
-	""" 
-	Gets the gas components and their corresponding proportions from the user
-	:param number_of_components: The # of chemical components making up the gas mixture
-	:type number_of_components: int
-	:return two lists: List 1 holds the gas components (list of str). List 2 holds the respective percentages for the gas 
-	components (list of decimal.Decimal)
-	"""
-
-	# Lists for holding user input
-	# Initialize them with None so we can access those indices before data is added
-	components = [None for i in range(number_of_components)]
-	components_percentages = [None for i in range(number_of_components)]
-
-	# For each component, prompt the user for data on the command line and validate it
-	for i in range(number_of_components):
-
-		supported_components_str = ', '.join([i for i in SUPPORTED_COMPONENTS])
-
-		print(f'Enter component #{i+1} gas type (must be one of the following {supported_components_str}):')
-
-		while components[i] not in SUPPORTED_COMPONENTS:
-
-			components[i] = input()
-
-			if components[i] not in SUPPORTED_COMPONENTS:
-				print(f'The component must be one of these {SUPPORTED_COMPONENTS} - try again:')
-
-		# If this is the final component, allow for Balance gas % calculation
-		if not i == number_of_components - 1:
-			print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
-		else:
-			print(f'Enter the percentage of {components[i]} in the mix. You can also type Bal (balance gas) for auto-calculation of the %:')
-
-		while not isinstance(components_percentages[i], Decimal):
-
-			components_percentages[i] = input()
-
-			if components_percentages[i] == 'Bal':
-				# Only calculate balance gas amount of its the last component in the mix
-				if not i == number_of_components - 1:
-					print(f'You can only use the Bal calculation feature for the last component. Enter a numberic value or start over:')
-					continue
-
-				else:
-					# Calculate balance gas amount by subtracting the sum of the other components_percentages from 100
-					components_percentages[i] = 100 - sum(components_percentages[i] for i in range(len(components_percentages)) if not components_percentages[i] == 'Bal')
-					break
+			self.number_of_components = input()
 
 			try:
-				components_percentages[i] = Decimal(components_percentages[i])
-			except InvalidOperation:
-				print(f'The component percentage must be a number (e.g. 10, 10.0) - try again:')
+				self.number_of_components = int(self.number_of_components)
+			except ValueError:
+				print(
+					f'The # of components must be a number between {MIN_NUMBER_OF_COMPONENTS} and {MAX_NUMBER_OF_COMPONENTS} - try again:')
+				continue
 
-	return components, components_percentages
+			if self.number_of_components not in range(MIN_NUMBER_OF_COMPONENTS, MAX_NUMBER_OF_COMPONENTS + 1):
+				print(
+					f'The # of components must be between {MIN_NUMBER_OF_COMPONENTS} and {MAX_NUMBER_OF_COMPONENTS} - try again:')
 
+	def get_component_info(self):
+		"""
+		Gets the gas components and their corresponding proportions from the user. Sets self.components with that info
 
-def percent_to_mass(component, cylinder_size, component_percentage):
-	""" 
-	Converts the percent by volume of a component to its mass (kilograms)
-	:param component: The molecular/atomic symbol for the gas
-	:type component: str
-	:param cylinder_size: The size of the cylinder to be filled. Either 'H' or 'J'
-	:type cylinder_size: str
-	:param component_percentage: The percentage of the cylinder that will be filled with this component
-	:type component_percentage: decimal.Decimal
-	:return decimal.Decimal: The mass (kg) of the gas component in the mixture
-	"""
+		:return: None
+		"""
 
-	component_percentage = component_percentage/100
-	
-	# Get the size of the cylinder in moles from its cylinder_size code
-	cyl_size_moles = CYL_SIZES_MOLES_DICT[cylinder_size]
+		num_of_components = self.number_of_components
 
-	# Get # of moles of the component required
-	component_moles = cyl_size_moles * component_percentage
+		# Initialize them with None so we can access those indices before data is added
+		components = [None for i in range(num_of_components)]
+		components_percentages = [None for i in range(num_of_components)]
 
-	# Convert moles --> kg using the component's molar mass
-	return round_number(component_moles * COMPONENTS_MOLAR_MASS_DICT[component])
+		# For each component, prompt the user for data on the command line and validate it
+		for i in range(num_of_components):
 
+			supported_components_str = ', '.join([i for i in SUPPORTED_COMPONENTS])
 
-def calculate_mix_makeup(components, components_percentages):
-	""" 
-	Calculates the masses of each component required to make the specified mix
-	:param components: List holding the gas components
-	:type components: list of str
-	:param components_percentages: List holding the gas components percentages
-	:type components_percentages: list of decimal.Decimal
-	:return a dict {component1: component1_mass, 
-					etc.. }
-	"""
+			print(
+				f'Enter component #{i + 1} gas type (must be one of the following {supported_components_str}):')
 
-	# Merge the two lists into a dict
-	components_dict = dict(zip(components, components_percentages))
+			while components[i] not in SUPPORTED_COMPONENTS:
 
-	# Get the kg mass for each component, add to a dict
-	components_masses_kg_dict = {}
-	for component, component_percentage in components_dict.items():
-		components_masses_kg_dict[component] = (percent_to_mass(component=component, cylinder_size=cyl_size, 
-																component_percentage=component_percentage))
+				components[i] = input()
 
-	return components_masses_kg_dict
+				if components[i] not in SUPPORTED_COMPONENTS:
+					print(f'The component must be one of these {SUPPORTED_COMPONENTS} - try again:')
 
+			# If this is the final component, allow for Balance gas % calculation
+			if not i == num_of_components - 1:
+				print(f'Enter the percentage of {components[i]} in the mix (e.g. 3.5):')
+			else:
+				print(
+					f'Enter the percentage of {components[i]} in the mix. You can also type Bal (balance gas) for auto-calculation of the %:')
 
-def print_result(components_masses):
-	""" 
-	Prints the results to the console in a decent looking way
-	:param components_masses: dict holding the gas components and their masses
-	:type components_masses: dict
-	:return None
-	"""
+			while not isinstance(components_percentages[i], Decimal):
 
-	print('\n')
-	print('--------------- RESULTS ---------------')
-	for component, component_mass in components_masses.items():
-		print(f' {component}                             {component_mass} kg')
-	print('\n')
+				components_percentages[i] = input()
 
+				if components_percentages[i] == 'Bal':
+					# Only calculate balance gas amount of its the last component in the mix
+					if not i == num_of_components - 1:
+						print(
+							f'You can only use the Bal calculation feature for the last component. Enter a numberic value or start over:')
+						continue
 
+					else:
+						# Calculate balance gas amount by subtracting the sum of the other components_percentages from 100
+						components_percentages[i] = 100 - sum(
+							components_percentages[i] for i in range(len(components_percentages)) if
+							not components_percentages[i] == 'Bal')
+						break
+
+				try:
+					components_percentages[i] = Decimal(components_percentages[i])
+				except InvalidOperation:
+					print(f'The component percentage must be a number (e.g. 10, 10.0) - try again:')
+
+		# Merge the two lists into a dict
+		self.components = dict(zip(components, components_percentages))
+
+	def percent_to_mass(self, component, component_percentage):
+		"""
+		Converts the percent by volume of a component to its mass (kilograms)
+		:param component: The molecular/atomic symbol for the gas
+		:type component: str
+		:param component_percentage: The percentage of the cylinder that will be filled with this component
+		:type component_percentage: decimal.Decimal
+		:return decimal.Decimal: The mass (kg) of the gas component in the mixture
+		"""
+
+		component_percentage = component_percentage / 100
+
+		# Get the size of the cylinder in moles from its cylinder_size code
+		cyl_size_moles = CYL_SIZES_MOLES_DICT[self.cylinder_size]
+
+		# Get # of moles of the component required
+		component_moles = cyl_size_moles * component_percentage
+
+		# Convert moles --> kg using the component's molar mass
+		return round_number(component_moles * COMPONENTS_MOLAR_MASS_DICT[component])
+
+	def calculate_mix_makeup(self):
+		"""
+		Calculates the masses of each component required to make the specified mix and sets self.components_masses
+
+		:return: None
+		"""
+
+		components = self.components
+
+		# Get the kg mass for each component, add to a dict
+		components_masses_kg_dict = {}
+		for component, component_percentage in components.items():
+			components_masses_kg_dict[component] = (self.percent_to_mass(component=component,
+																		 component_percentage=component_percentage))
+
+		self.components_masses = components_masses_kg_dict
+
+	def print_result(self):
+		"""
+		Prints the results to the console in a decent looking way
+
+		:return: None
+		"""
+
+		components_masses = self.components_masses
+
+		print('\n')
+		print('--------------- RESULTS ---------------')
+		for component, component_mass in components_masses.items():
+			print(f' {component}                             {component_mass} kg')
+		print('\n')
+
+	def check_total_percentage(self):
+		"""
+		Sums the percentage values entered by the user to see if they add up to 100. If not, a warning
+			message is given to the user. If they sum to 100, nothing happens. If not, the warning is
+			sent to stdout
+
+		"""
+
+		if sum(self.components.values()) != 100:
+			print(f"NOTE: The component %'s you entered do not sum to 100")
 
 
 # Run CLI program on loop so that a) Console stays open and b) User can calculate multiple mixes
 while True:
+	# Create a new GasMixture instance
+	mix = GasMixture()
 
 	# What size gas cylinder is it?
-	cyl_size = get_cylinder_size()
+	mix.set_cylinder_size()
 
 	# How many different components are there in the gas mixture?
-	num_components = get_number_of_components()
-	
-	# What are the different components and what volume % do they contribute to the mix?
-	components, components_percentages = get_component_info(number_of_components=num_components)
+	mix.set_number_of_components()
 
-	# Be liberal and just let user know that their math is off
-	if not sum(components_percentages) == 100:
-		print('NOTE: your component percentages do not add up to 100')
+	# What are the different components and what volume % do they contribute to the mix?
+	mix.get_component_info()
+
+	# If the mix's components' percentages don't sum to 100, give the user a warning message
+	mix.check_total_percentage()
 
 	# Calculate the mass (in kg) for each component
-	components_masses_kg_dict = calculate_mix_makeup(components=components, components_percentages=components_percentages)
+	mix.calculate_mix_makeup()
 
 	# Display results in console
-	print_result(components_masses=components_masses_kg_dict)
+	mix.print_result()
